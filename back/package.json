@@ -1,0 +1,25 @@
+{
+  "name": "back",
+  "version": "1.0.0",
+  "description": "System of rent of field for soccer matches",
+  "main": "./bild/index.js",
+  "scripts": {
+    "test": "npm jest",
+    "build": "tsc",
+    "start": "tsc && node ./build/index.js"
+  },
+  "keywords": [
+    "turn",
+    "rent",
+    "soccer",
+    "field",
+    "matches"
+  ],
+  "author": "cos4h",
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
+    "eslint": "^8.57.0"
+  }
+}
