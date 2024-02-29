@@ -1,16 +1,17 @@
-export interface IReservation {
-  id_reservation: number;
+export interface ITurn {
+  id_turn: number;
   username_client: string;
   username_admin: string;
   id_fields: TField[];
-  id_turn: number;
-  date: Date;
+  date: number;
   state: EState;
+  start_time: number;
+  finish_time: number;
 }
 
 type TField = 1 | 2 | 3 | 4;
 
-enum EState {
+export enum EState {
   ACTIVE = "Active",
   CANCELED = "Canceled",
 }

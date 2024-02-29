@@ -1,16 +1,10 @@
-import { IClient } from "./interfaces/Client";
-import { Role } from "./interfaces/User";
+// import { IClient } from "./interface/Client";
+// import { Role } from "./interface/Client";
 
-const userIndex: IClient = {
-  username: "olvadis2004@gmail",
-  first_name: "olvadis",
-  last_name: "Hernandez",
-  contact: {
-    phone: "3023246222",
-  },
-  role: Role.ADMIN,
-  profile_image: "https://cos4h.png",
-  id_credential: 400,
-};
+// console.log(ClientIndex);
 
-console.log(userIndex);
+import server from "./server";
+import { PORT } from "./config/envs";
+server.listen(PORT, () => {
+  console.log(`Server running on port http://127.0.0.1:${PORT}`);
+});
