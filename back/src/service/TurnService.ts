@@ -1,24 +1,18 @@
 import { EState, ITurn } from "../interface/Turn";
-import logger from "../utils/logger";
-
-const turn: ITurn = {
-  id_turn: 1,
-  username_client: "olvadis2004@gmail.com",
-  username_admin: "admin@admin.com",
-  id_fields: [1, 3],
-  date: new Date().getTime(),
-  state: EState.ACTIVE,
-  start_time: 840,
-  finish_time: 900,
-};
+import turns from "../DAO/TurnDAO";
+import TurnNotFoundError from "../Error/TurnNotFoundError";
+import { setTurns } from "../DAO/TurnDAO";
 
 export const findTurns = async (): Promise<ITurn[]> => {
-  return [turn];
+  return turns;
 };
 
 export const findTurn = async (id_turn: number): Promise<ITurn> => {
-  turn.id_turn = id_turn;
-  return turn;
+  const turnFound = turns.find((turn) => turn.id_turn === id_turn);
+  if (!turnFound) {
+    throw new TurnNotFoundError();
+  }
+  return turnFound;
 };
 
 export const addTurn = async (turnToAdd: ITurn): Promise<ITurn> => {
@@ -31,9 +25,18 @@ export const refreshTurn = async (
   turnToUpdate: ITurn
 ): Promise<ITurn> => {
   turnToUpdate.id_turn = id_turn;
+
+  const turnsUpdated = turns.map((turn) =>
+    turn.id_turn !== id_turn ? turnToUpdate : turn
+  );
+  setTurns(turnsUpdated);
   return turnToUpdate;
 };
 
 export const removeTurn = async (id_turn: number): Promise<void> => {
-  logger.info(`removed User with username=${id_turn}`);
+  const turnToCanceled = await findTurn(id_turn);
+  (await turnToCanceled).state = EState.CANCELED;
+  setTurns(
+    turns.map((turn) => (turn.id_turn !== id_turn ? turn : turnToCanceled))
+  );
 };

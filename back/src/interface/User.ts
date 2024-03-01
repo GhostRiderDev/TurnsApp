@@ -5,6 +5,7 @@ export interface IUser {
   last_name: string;
   role: Role;
   id_credential: number;
+  nDni: string;
 }
 
 export enum Role {

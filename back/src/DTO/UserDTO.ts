@@ -10,6 +10,7 @@ interface UserDTO {
   };
   profile_image?: string;
   role: Role;
+  id_credential?: number;
 }
 
 export default UserDTO;

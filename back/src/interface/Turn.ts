@@ -1,7 +1,7 @@
 export interface ITurn {
   id_turn: number;
-  username_client: string;
-  username_admin: string;
+  id_client: number;
+  id_admin: number;
   id_fields: TField[];
   date: number;
   state: EState;

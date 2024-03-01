@@ -8,6 +8,8 @@ import {
   removeUser,
 } from "../service/UserService";
 import UserDTO from "../DTO/UserDTO";
+import CredentialDTO from "../DTO/CredentialDTO";
+import { addCredential } from "../service/CredentialService";
 
 export const getUsers = async (
   _: Request,
@@ -32,10 +34,13 @@ export const getUser = async (
 };
 
 export const createUser = async (
-  req: Request<UserDTO>,
+  req: Request<{ user: UserDTO; credential: CredentialDTO }>,
   res: Response<UserDTO>
 ): Promise<void> => {
-  const userToSave: UserDTO = req.body.User;
+  const userToSave: UserDTO = req.body.user;
+  const credentialToSave: CredentialDTO = req.body.credential;
+  const id_credential = await addCredential(credentialToSave.password);
+  userToSave.id_credential = id_credential;
   const userSaved: UserDTO = await addUser(userToSave);
   res.status(201).send(userSaved);
 };
@@ -66,8 +71,8 @@ export const login = async (
   const { username, password } = req.body;
   const isValid = await isValidCredentials(username, password);
   if (isValid) {
-    res.status(200).json({ result: "Authorized" });
+    res.status(200).json({ result: "Authorized" }).send();
   } else {
-    res.status(204).json({ result: "UnAuthorized" });
+    res.status(204).json({ result: "UnAuthorized" }).send();
   }
 };
