@@ -1,5 +1,5 @@
 export interface ICredential {
-  id_credential: number;
+  id_credential: string;
   password_hash: string;
 }
 

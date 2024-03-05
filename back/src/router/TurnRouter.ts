@@ -3,16 +3,15 @@ import {
   getTurns,
   getTurn,
   createTurn,
-  updateTurn,
   cancelTurn,
 } from "../controller/TurnController";
+import { isAdmin, verifyToken } from "../middleware/token";
 
 const turnsRouter = express.Router();
 
-turnsRouter.get("/", getTurns);
-turnsRouter.get("/:id", getTurn);
-turnsRouter.post("/schedule", createTurn);
-turnsRouter.put("/", updateTurn);
-turnsRouter.delete("/:id", cancelTurn);
+turnsRouter.get("/", isAdmin, getTurns);
+turnsRouter.get("/:id", verifyToken, getTurn);
+turnsRouter.post("/schedule", verifyToken, createTurn);
+turnsRouter.delete("/:id", verifyToken, cancelTurn);
 
 export default turnsRouter;

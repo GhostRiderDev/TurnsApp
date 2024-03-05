@@ -1,28 +1,17 @@
-const info = (...information: string[]): void => {
-  console.info("--[INFO]\t", ...information);
+const info = (message: string): void => {
+  console.info(`\n\x1b[34m--[INFO]\t\nMessage: ${message}\n\x1b[0m`);
 };
 
-const warn = (...advertise: string[]): void => {
-  console.warn("--[WARNING]\t", ...advertise);
+const warn = (name: string, message: string, stackTrace: string): void => {
+  console.warn(
+    `\n\n\n\x1b[33m--[WARNING]\t${name}\n\nMessage:\t ${message}\n\nStack Trace:\t ${stackTrace}\n\n\n\x1b[0m`
+  );
 };
 
-const err = (...error: string[]): void => {
-  console.error("--[ERROR]\t", ...error);
+const err = (name: string, message: string, stackTrace: string): void => {
+  console.error(
+    `\n\n\n\x1b[31m--[ERROR]\t${name}\n\nMessage:\t ${message}\n\nStack Trace:\t ${stackTrace}\n\n\n`
+  );
 };
+
 export default { info, warn, err };
-
-// {
-//   "user": {
-//       "username": "maria@gmail",
-//       "first_name": "maria",
-//       "last_name": "Ledesma",
-//       "role": "Admin",
-//       "contact": {
-//           "phone": "43343534"
-//       },
-//       "profile_image": "https://maria.png"
-//   },
-//   "credential": {
-//       "password": "root"
-//   }
-// }

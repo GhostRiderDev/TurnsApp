@@ -1,21 +1,30 @@
-import credentials from "../DAO/CredentialDAO";
-import { ICredential } from "../interface/Credential";
-import { generateId } from "../utils/generate";
+import { UUID } from "crypto";
+import CredentialEntity from "../entity/CredentialEntity";
+import { CredentialDAO } from "../repository/repositories";
+import bcrypt from "bcryptjs";
 
 export const validateCredential = async (
-  id: number,
+  id: UUID,
   key: string
 ): Promise<boolean> => {
-  const credential = credentials.find((c) => c.id_credential === id);
-  return credential?.password_hash === key;
+  const credential = await CredentialDAO.findOneBy({
+    id_credential: id,
+  });
+
+  if (!credential) {
+    return false;
+  }
+
+  return bcrypt.compare(key, credential?.password_hash);
 };
 
-export const addCredential = async (key: string): Promise<number> => {
-  const id: number = await generateId(credentials as [], "id_credential");
-  const credential: ICredential = {
-    id_credential: id,
-    password_hash: key,
-  };
-  credentials.push(credential);
-  return id;
+export const addCredential = async (key: string): Promise<string> => {
+  const credentialFromEntity = new CredentialEntity();
+  const saltRounds = 10;
+  const passwordHash = await bcrypt.hash(key, saltRounds);
+  credentialFromEntity.password_hash = passwordHash;
+  const credentialSaved: CredentialEntity = await CredentialDAO.save(
+    credentialFromEntity
+  );
+  return credentialSaved.id_credential;
 };
