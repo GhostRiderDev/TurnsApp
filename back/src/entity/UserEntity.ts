@@ -26,10 +26,13 @@ class UserEntity {
 
   @Column({ type: "varchar", nullable: true })
   nDni!: string;
+
   @Column({ type: "varchar", nullable: true })
   phone!: string;
+
   @Column({ type: "varchar", nullable: true })
   profile_image!: string;
+
   @Column({ type: "date", nullable: true })
   birthdate!: Date;
 

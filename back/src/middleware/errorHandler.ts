@@ -34,7 +34,7 @@ const errorHandler = (
   } else if (err.name === "SyntaxError") {
     res.status(401).json({ error: "Invalid token" });
   } else if (err.name === "InvalidOperatioError") {
-    res.status(401).json({ error: err.message });
+    res.status(400).json({ error: err.message });
   } else {
     res.status(500).json({ error: err.message });
     next(err);

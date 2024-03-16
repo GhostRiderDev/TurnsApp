@@ -5,6 +5,7 @@ import {
   findTurn,
   addTurn,
   updateTurn,
+  findTurnsClient,
 } from "../service/TurnService";
 import { UUID } from "crypto";
 import TurnDTO from "../DTO/TurnDTO";
@@ -12,6 +13,9 @@ import { validateTurn } from "../service/validations";
 import ValidationErrror from "../Error/ValidationError";
 import { findUser } from "../service/UserService";
 import ResourceNotFoundError from "../Error/ResourceNotFoundError";
+import InvalidOperatioError from "../Error/InvalidOperationError";
+import { decodeToken, getTokenFrom } from "../middleware/token";
+import { JwtPayload } from "jsonwebtoken";
 
 export const getTurns = async (_: Request, res: Response): Promise<void> => {
   const turns = await findTurns();
@@ -23,6 +27,39 @@ export const getTurns = async (_: Request, res: Response): Promise<void> => {
     .send();
 };
 
+export const getTurnsClient = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id_user } = req.params;
+    if (!id_user) {
+      throw new ValidationErrror("id_user not can be empty");
+    }
+    const turnsClient = await findTurnsClient(id_user as UUID);
+    if (!turnsClient.length) {
+      res.status(200).json({ turns: turnsClient }).send();
+    }
+
+    const token = getTokenFrom(req);
+    if (!token) {
+      throw new ValidationErrror("token not can be empty");
+    }
+    const decodedToken: JwtPayload | string = decodeToken(token);
+    if (typeof decodedToken === "string") {
+      throw new ValidationErrror("Invalid token");
+    }
+    if (turnsClient[0].id_client !== decodedToken.id_user) {
+      throw new InvalidOperatioError("Unauthorized");
+    }
+    if (turnsClient[0].id_client === decodedToken.id_user) {
+      res.status(200).json({ turns: turnsClient });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 export const getTurn = async (req: Request, res: Response): Promise<void> => {
   const id: string = req.params.id;
   const turn = await findTurn(id as UUID);
@@ -40,6 +77,7 @@ export const createTurn = async (
     if (!turnToSave) {
       throw new ValidationErrror("Turn not can be empty");
     }
+
     validateTurn(turnToSave);
     const clienDB = findUser(turnToSave.id_client as UUID);
     const adminDB = findUser(turnToSave.id_admin as UUID);

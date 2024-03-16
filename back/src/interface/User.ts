@@ -8,7 +8,7 @@ export interface IUser {
   nDni: string;
   phone: string;
   profile_image: string;
-  birthdate: number;
+  birthdate: string;
 }
 
 export enum Role {

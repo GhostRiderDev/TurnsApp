@@ -8,6 +8,10 @@ import { validateUUID } from "../service/validations";
 import TurnDTO from "../DTO/TurnDTO";
 import InvalidOperatioError from "../Error/InvalidOperationError";
 
+export function decodeToken(token: string) {
+  return jwt.verify(token, SECRET as string);
+}
+
 export const verifyToken = (
   req: Request,
   _res: Response,
@@ -18,15 +22,24 @@ export const verifyToken = (
     throw new ValidationErrror("Token not can be empty");
   }
 
-  const decodedToken: JwtPayload | string = jwt.verify(token, SECRET as string);
+  const decodedToken: JwtPayload | string = decodeToken(token);
 
   if (typeof decodedToken === "string") {
     throw new ValidationErrror("Invalid token");
   }
-  if (!decodedToken.id) {
+  if (!decodedToken.id_user) {
     throw new ValidationErrror("Invalid token");
   }
   return next();
+};
+
+export const getTokenFrom = (req: Request) => {
+  const authorization = req.get("authorization");
+
+  if (authorization && authorization.startsWith("Bearer ")) {
+    return authorization.slice(7);
+  }
+  return null;
 };
 
 export const isAdmin = async (
@@ -44,7 +57,7 @@ export const isAdmin = async (
   if (typeof decodedToken === "string") {
     throw new ValidationErrror("Invalid token");
   }
-  const user = await UserDAO.findOneBy({ id_user: decodedToken.id });
+  const user = await UserDAO.findOneBy({ id_user: decodedToken.id_user });
 
   if (!user) {
     throw new ResourceNotFoundError("User not found");
@@ -56,15 +69,6 @@ export const isAdmin = async (
 
   return next();
 };
-const getTokenFrom = (req: Request) => {
-  const authorization = req.get("authorization");
-
-  if (authorization && authorization.startsWith("Bearer ")) {
-    return authorization.slice(7);
-  }
-  return null;
-};
-
 export const isMine = async (
   req: Request,
   res: Response,
@@ -80,7 +84,7 @@ export const isMine = async (
   if (typeof decodedToken === "string") {
     throw new ValidationErrror("Invalid token");
   }
-  const user = await UserDAO.findOneBy({ id_user: decodedToken.id });
+  const user = await UserDAO.findOneBy({ id_user: decodedToken.id_user });
 
   if (!user) {
     throw new ResourceNotFoundError("User not found");
@@ -117,7 +121,7 @@ export const isMyTurn = async (
 
   const turnToSave: TurnDTO = req.body.turn;
 
-  if (decodedToken.id !== turnToSave.id_client) {
+  if (decodedToken.id_user !== turnToSave.id_client) {
     throw new InvalidOperatioError(
       "Invalid operation you need must be a client"
     );

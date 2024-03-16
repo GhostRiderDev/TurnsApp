@@ -46,7 +46,7 @@ export const mailPresentation = () => `
   <h1>¡Registro Exitoso!</h1>
   <p>Bienvenido/a a nuestro sitio. Tu registro se ha completado con éxito.</p>
   <p>Ahora puedes comenzar a disfrutar de nuestros servicios.</p>
-  <a href="http://localhost:8888/users/login" class="button">Iniciar sesión</a>
+  <a href="http://localhost:5173/auth/login" class="button">Iniciar sesión</a>
 </div>
 </body>
 </html>
