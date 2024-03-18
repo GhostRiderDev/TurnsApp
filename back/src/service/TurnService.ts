@@ -6,6 +6,7 @@ import { getFieldsByIds } from "./FieldService";
 import TurnDTO from "../DTO/TurnDTO";
 import { TurnDAO } from "../repository/repositories";
 import { UUID } from "crypto";
+import moment from "moment";
 
 export const findTurns = async (): Promise<ITurn[]> => {
   const turns: TurnEntity[] = await TurnDAO.find();
@@ -13,6 +14,7 @@ export const findTurns = async (): Promise<ITurn[]> => {
     const turnToReturn: ITurn = convertDBtoReturn(turnDB);
     return turnToReturn;
   });
+
   return turnsToReturn as ITurn[];
 };
 
@@ -39,9 +41,8 @@ export const addTurn = async (turnToAdd: TurnDTO): Promise<ITurn> => {
 
   const fieldsEntity: FieldEntity[] = await getFieldsByIds(turnToAdd.id_fields);
 
-  turnFromEntity.id_admin = turnToAdd.id_admin;
   turnFromEntity.id_client = turnToAdd.id_client;
-  turnFromEntity.date = new Date(turnToAdd.date);
+  turnFromEntity.date = moment(turnToAdd.date).zone("America/Havana").toDate();
   turnFromEntity.start_time = turnToAdd.start_time;
   turnFromEntity.finish_time = turnToAdd.finish_time;
   turnFromEntity.id_fields = fieldsEntity;
@@ -49,7 +50,7 @@ export const addTurn = async (turnToAdd: TurnDTO): Promise<ITurn> => {
 
   const turnSaved = await TurnDAO.save(turnFromEntity);
   const turnToReturn: ITurn = convertDBtoReturn(turnSaved);
-  console.log(turnToReturn);
+  console.log("Backeado", turnSaved);
   return turnToReturn as ITurn;
 };
 

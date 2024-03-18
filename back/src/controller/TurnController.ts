@@ -80,15 +80,12 @@ export const createTurn = async (
 
     validateTurn(turnToSave);
     const clienDB = findUser(turnToSave.id_client as UUID);
-    const adminDB = findUser(turnToSave.id_admin as UUID);
     if (!clienDB) {
       throw new ResourceNotFoundError(
         `Client not found with id: ${turnToSave.id_client}`
       );
     }
-    if (!(adminDB && (await adminDB).role === "Admin")) {
-      throw new ResourceNotFoundError("Invalid Admin");
-    }
+
     const turnSaved: ITurn = await addTurn(turnToSave);
     res.status(201).send(turnSaved);
   } catch (error) {

@@ -8,7 +8,6 @@ enum EState {
 interface ITurn {
   id_turn?: string;
   id_client: string;
-  id_admin: string;
   date: string;
   state?: EState;
   start_time: number;

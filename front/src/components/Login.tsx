@@ -54,7 +54,7 @@ const Login = () => {
 
   return (
     <div className="flex flex-row">
-      <div className=" h-[89vh] bg-slate-950 md:w-1/2"></div>
+      <div className=" h-[89vh] bg-slate-950 md:w-1/2 left-part"></div>
       <Card className="w-full flex flex-col my-auto mx-auto max-w-sm md:w-1/2">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Login</CardTitle>

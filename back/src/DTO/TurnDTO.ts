@@ -4,7 +4,6 @@ import { EState } from "../interface/Turn";
 interface TurnDTO {
   id_turn?: string;
   id_client: string;
-  id_admin: string;
   date: string;
   state?: EState;
   start_time: number;

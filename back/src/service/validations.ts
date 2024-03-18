@@ -118,18 +118,17 @@ export const validateClientToUpdate = (clientToValid: object) => {
 
 const turnSchema = Joi.object({
   id_client: Joi.string().uuid(),
-  id_admin: Joi.string().uuid(),
   date: Joi.date().min("now").required(),
   start_time: Joi.number()
     // 11 AM
-    .greater(660)
+    .greater(659)
     // 11:30 PM
-    .less(1350),
+    .less(1349),
   finish_time: Joi.number()
     // 11:30 AM
-    .greater(690)
+    .greater(689)
     // 12 PM
-    .less(1380),
+    .less(1379),
   id_fields: Joi.array().items(Joi.string().uuid()),
 });
 
