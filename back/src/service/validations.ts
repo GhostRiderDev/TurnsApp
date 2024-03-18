@@ -2,7 +2,6 @@ import validator from "validator";
 import Joi from "joi";
 
 import ValidationErrror from "../Error/ValidationError";
-import UserDTO from "../DTO/UserDTO";
 import logger from "../utils/logger";
 
 export const validateUUID = (id: string): void => {
@@ -34,16 +33,20 @@ const userSchema = Joi.object({
     })
     .regex(/\.(jpg|jpeg|png|gif)$/)
     .optional(),
-  birthdate: Joi.number()
-    //* now - 100 years
-    .min(new Date().getTime() - 3153600000000)
-    //* now - 5 years
-    .max(new Date().getTime() - 157680000000)
+  birthdate: Joi.date()
+    .max("now")
+    .timestamp("javascript") // La fecha de nacimiento no puede ser en el futuro
+    .min(new Date(new Date().setFullYear(new Date().getFullYear() - 100))) // Establece un rango de 100 años hacia atrás
     .optional(),
 });
 
-export const validateUser = (userToValid: UserDTO) => {
-  if (userSchema.validate(userToValid).error) {
+export const validateUser = (userToValid: object) => {
+  console.log("pasa por aqui", userToValid);
+
+  const { error } = userSchema.validate(userToValid);
+  if (error) {
+    console.log(error);
+
     throw new ValidationErrror("User format invalid");
   }
 };
@@ -65,12 +68,11 @@ const clientSchema = Joi.object({
     })
     .regex(/\.(jpg|jpeg|png|gif)$/)
     .required(),
-  birthdate: Joi.number()
-    //* now - 100 years
-    .min(new Date().getTime() - 3153600000000)
-    //* now - 5 years
-    .max(new Date().getTime() - 157680000000)
-    .optional(),
+  birthdate: Joi.date()
+    .max("now")
+    .timestamp("javascript") // La fecha de nacimiento no puede ser en el futuro
+    .min(new Date(new Date().setFullYear(new Date().getFullYear() - 100))) // Establece un rango de 100 años hacia atrás
+    .required(),
 });
 
 export const validateClient = (clientToValid: object) => {
@@ -101,11 +103,10 @@ const clientToUpdateSchema = Joi.object({
     })
     .regex(/\.(jpg|jpeg|png|gif)$/)
     .optional(),
-  birthdate: Joi.number()
-    //* now - 100 years
-    .min(new Date().getTime() - 3153600000000)
-    //* now - 5 years
-    .max(new Date().getTime() - 157680000000)
+  birthdate: Joi.date()
+    .max("now")
+    .timestamp("javascript") // La fecha de nacimiento no puede ser en el futuro
+    .min(new Date(new Date().setFullYear(new Date().getFullYear() - 100))) // Establece un rango de 100 años hacia atrás
     .optional(),
 }).unknown(false);
 
@@ -118,10 +119,7 @@ export const validateClientToUpdate = (clientToValid: object) => {
 const turnSchema = Joi.object({
   id_client: Joi.string().uuid(),
   id_admin: Joi.string().uuid(),
-  date: Joi.number()
-    //  future
-    .greater(new Date().getTime())
-    .required(),
+  date: Joi.date().min("now").required(),
   start_time: Joi.number()
     // 11 AM
     .greater(660)

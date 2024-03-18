@@ -9,7 +9,7 @@ interface UserDTO {
   profile_image?: string;
   role: Role;
   id_credential?: string;
-  birthdate: number;
+  birthdate: string;
   nDni?: string;
 }
 

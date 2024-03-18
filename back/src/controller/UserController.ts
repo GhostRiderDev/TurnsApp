@@ -21,6 +21,8 @@ import {
 import ResourceNotFoundError from "../Error/ResourceNotFoundError";
 import { AppDataSource } from "../data-source";
 import ValidationErrror from "../Error/ValidationError";
+import { UserDAO } from "../repository/repositories";
+import InvalidOperatioError from "../Error/InvalidOperationError";
 
 export const getUsers = async (
   _: Request,
@@ -59,11 +61,25 @@ export const registerUser = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const userToSave: UserDTO = req.body.user;
+    const userReceived: UserDTO = req.body.user;
+    const userToSave = {
+      ...userReceived,
+      birthdate: new Date(userReceived.birthdate),
+    };
+
     validateUser(userToSave);
-    if (userToSave.role === "Client") {
+    if (userReceived.role === "Client") {
       const { birthdate, profile_image, phone, nDni } = userToSave;
       validateClient({ birthdate, profile_image, phone, nDni });
+    }
+    const userExist = (
+      await UserDAO.existsBy({ username: userReceived.username })
+    ).valueOf();
+
+    if (userExist) {
+      throw new InvalidOperatioError(
+        `User with user with username ${userReceived.username} is already registered`
+      );
     }
     const credentialToSave: CredentialDTO = req.body.credential;
 
@@ -72,8 +88,8 @@ export const registerUser = async (
       "REPEATABLE READ",
       async () => {
         const id_credential = await addCredential(credentialToSave.password);
-        userToSave.id_credential = id_credential;
-        const userSaved: UserDTO = await addUser(userToSave);
+        userReceived.id_credential = id_credential;
+        const userSaved: UserDTO = await addUser(userReceived);
         return userSaved;
       }
     );
@@ -129,10 +145,11 @@ export const login = async (
   try {
     const { username, password } = req.body;
     const isValid = await isValidCredentials(username, password);
+    const data = await generateToken(username);
     if (isValid) {
       res
         .status(200)
-        .json({ token: await generateToken(username) })
+        .json({ ...data })
         .send();
     } else {
       res.status(204).json({ result: "UnAuthorized" }).send();

@@ -6,7 +6,6 @@ import { AppDataSource } from "../data-source";
 import UserEntity from "../entity/UserEntity";
 import { UUID } from "crypto";
 import ResourceNotFoundError from "../Error/ResourceNotFoundError";
-import { dateToNumber, numberToDate } from "../utils/DateConverter";
 import { UserDAO } from "../repository/repositories";
 import jwt from "jsonwebtoken";
 import { SECRET } from "../config/envs";
@@ -15,9 +14,10 @@ export const findUsers = async (): Promise<UserDTO[]> => {
   const usersDB: UserEntity[] = await UserDAO.find();
   const usersDTO: UserDTO[] = await Promise.all(
     usersDB.map((userDB: UserEntity) => {
+      const date = userDB.birthdate;
       const userDTO: UserDTO = {
         ...userDB,
-        birthdate: new Date(userDB.birthdate).getTime(),
+        birthdate: `${date.getDay}/${date.getMonth}/${date.getFullYear}`,
       };
       return userDTO;
     })
@@ -33,9 +33,10 @@ export const findUser = async (id: UUID): Promise<UserDTO> => {
   if (!userFound) {
     throw new ResourceNotFoundError("User not found");
   } else {
+    const date = new Date(userFound.birthdate);
     const userDTO: UserDTO = {
       ...userFound,
-      birthdate: new Date(userFound.birthdate).getTime(),
+      birthdate: `${date.getDay}/${date.getMonth}/${date.getFullYear}`,
     };
 
     return userDTO;
@@ -62,14 +63,15 @@ export const addUser = async ({
   userFromEntity.profile_image = profile_image as string;
   userFromEntity.role = role;
   userFromEntity.phone = phone as string;
-  userFromEntity.birthdate = numberToDate(birthdate);
+  userFromEntity.birthdate = new Date(birthdate);
   userFromEntity.nDni = nDni as string;
 
   const userDB: UserEntity = await UserDAO.save(userFromEntity);
 
+  const date = userDB.birthdate;
   const userDTO_DB: IUser = {
     ...userDB,
-    birthdate: dateToNumber(userDB.birthdate),
+    birthdate: `${date.getDay}/${date.getMonth}/${date.getFullYear}`,
   };
 
   const userSavedDTO = convertUserToDTO(userDTO_DB);
@@ -86,8 +88,7 @@ export const refreshUser = async (
     throw new ResourceNotFoundError(`Not found User with id: ${id}`);
   }
   userToUpdate.id_user = id;
-  const date = new Date();
-  date.setTime(userToUpdate.birthdate);
+  const date = new Date(userToUpdate.birthdate);
 
   await UserDAO.update(
     {
@@ -175,18 +176,19 @@ export const validLogin = async (
   }
 };
 
-export const generateToken = async (username: string): Promise<string> => {
+export const generateToken = async (username: string): Promise<object> => {
   const user = await UserDAO.findOneBy({ username });
 
   if (!user) {
     throw new ResourceNotFoundError("User not found");
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id_credential, ...userToSend } = user;
   const userForToken = {
-    username: user.username,
-    id: user.id_user,
+    ...userToSend,
   };
   const token = jwt.sign(userForToken, SECRET as string, {
     expiresIn: 60 * 60 * 2,
   });
-  return token;
+  return { token };
 };
