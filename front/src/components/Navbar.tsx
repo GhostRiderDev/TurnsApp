@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 const Navbar = () => {
   return (
     <header className="flex flex-row justify-around min-h-16 items-center w-full sticky z-10 bg-[#001849] text-white top-0">
-      <div className="w-2/12">Logo</div>
+      <div className="w-2/12 italic font-bold text-2xl">JogOrtiz</div>
       <nav className="hidden  flex-row justify-start gap-x-24  w-5/12 md:flex">
         <div className="px-2 py-1 rounded-md hover:bg-sky-500 hover:text-slate-700">
           <Link to="/home">Home</Link>

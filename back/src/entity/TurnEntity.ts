@@ -42,13 +42,6 @@ class TurnEntity {
   @ManyToOne(() => UserEntity, (user) => user.turns)
   @JoinColumn({ name: "id_client" })
   client!: UserEntity;
-
-  @Column({ type: "uuid", nullable: false })
-  id_admin!: string;
-
-  @ManyToOne(() => UserEntity, (user) => user.turns)
-  @JoinColumn({ name: "id_admin" })
-  admin!: UserEntity;
 }
 
 export default TurnEntity;

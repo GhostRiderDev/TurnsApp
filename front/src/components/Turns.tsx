@@ -27,6 +27,7 @@ function Turns() {
   );
   useEffect(() => {
     setTurns(turnsFromDB);
+    console.log(turns);
   }, [turnsFromDB]);
 
   const convertMinsToHrsMins = (mins: number): string => {
