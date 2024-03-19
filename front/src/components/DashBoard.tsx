@@ -4,17 +4,18 @@ import { IoTicketSharp } from "react-icons/io5";
 import { MdBookmarkAdd } from "react-icons/md";
 import { GiSoccerField } from "react-icons/gi";
 import { CiLogout } from "react-icons/ci";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { setTurnsClient } from "@/reducer/turnsReducer";
 import { AppDispatch } from "@/store/store";
+import { setUser } from "@/reducer/userReducer";
 
 function DashBoard() {
   const user = useSelector((state: { user: IUser }) => state.user);
   const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
 
-  console.log(user.id_user);
   useEffect(() => {
     dispatch(setTurnsClient(user.id_user));
   }, [dispatch, user.id_user]);
@@ -55,7 +56,13 @@ function DashBoard() {
           <h5 className="w-4/6">Canchas</h5>
         </Link>
       </div>
-      <div className="h-1/6  hover:bg-greenLight hover:text-blueDark font-bold flex items-center">
+      <div
+        className="h-1/6  hover:bg-greenLight hover:text-blueDark font-bold flex items-center hover:cursor-pointer"
+        onClick={() => {
+          dispatch(setUser(null));
+          navigate("/");
+        }}
+      >
         <CiLogout className="w-2/6" size={40} />
         <h5 className="w-4/6">Cerrar sesion</h5>
       </div>

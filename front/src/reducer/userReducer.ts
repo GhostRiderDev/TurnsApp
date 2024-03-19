@@ -20,9 +20,11 @@ export const setLogedUser = createAsyncThunk(
   async (credential: ICredential, { dispatch }) => {
     try {
       const response = await login(credential);
+      console.log(response);
 
-      const token = jwtDecode(response.token);
-      window.localStorage.setItem("token", response.token);
+      const { token } = response;
+      const decodedToken = jwtDecode(token);
+      window.localStorage.setItem("token", token);
       const {
         birthdate,
         first_name,
@@ -32,7 +34,7 @@ export const setLogedUser = createAsyncThunk(
         phone,
         profile_image,
         role,
-      }: ITokenUser = token as ITokenUser;
+      }: ITokenUser = decodedToken as ITokenUser;
 
       dispatch(
         setUser({
@@ -46,6 +48,7 @@ export const setLogedUser = createAsyncThunk(
           role,
         })
       );
+      return response;
     } catch (error) {
       // Manejar el error si la autenticación falla
       console.error("Error en el inicio de sesión:", error);

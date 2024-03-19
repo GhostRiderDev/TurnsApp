@@ -30,15 +30,21 @@ import {
 } from "@/components/ui/carousel";
 import { useSelector } from "react-redux";
 import { IUser } from "@/interface/user";
-import { createTurnClient } from "@/services/turns";
 import ITurn from "@/interfaces/ITurn";
+import { useDispatch } from "react-redux";
+import { addTurnClient } from "@/reducer/turnsReducer";
+import { AppDispatch } from "@/store/store";
+import { useNavigate } from "react-router";
 
 const TurnForm = () => {
   const user = useSelector((state: { user: IUser }) => state.user);
+  const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
+
   const form = useForm<z.infer<typeof turnSchema>>({
     resolver: zodResolver(turnSchema),
     defaultValues: {
-      date: new Date().toDateString(),
+      date: new Date().toISOString().split("T")[0],
       startTime: "11:00",
       finishTime: "11:30",
     },
@@ -68,12 +74,9 @@ const TurnForm = () => {
       finish_time: totalMinFinish,
       id_fields: ["2da46c9f-3a96-4dcf-a428-8bd5e7422d01"],
     };
-    const token = window.localStorage.getItem("token");
-    console.log("double click", turnToSend);
 
-    if (token !== null) {
-      createTurnClient(turnToSend, token);
-    }
+    dispatch(addTurnClient(turnToSend));
+    navigate("/user/turns");
   };
   return (
     <div className="flex flex-row my-auto w-[78vw] mt-8 h-screen items-center">

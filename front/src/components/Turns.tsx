@@ -7,7 +7,7 @@ import {
 import { MdPendingActions } from "react-icons/md";
 import { FcCancel } from "react-icons/fc";
 import { FaHistory } from "react-icons/fa";
-
+import moment from "moment";
 import {
   Card,
   CardContent,
@@ -19,16 +19,24 @@ import { Button } from "./ui/button";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import ITurn from "@/interfaces/ITurn";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
+import { cancelTurn } from "@/reducer/turnsReducer";
 
 function Turns() {
   const [turns, setTurns] = useState<ITurn[]>([]);
   const turnsFromDB: ITurn[] = useSelector(
     (state: { turns: [] }) => state.turns
   );
+  const dispatch: AppDispatch = useDispatch();
+
   useEffect(() => {
     setTurns(turnsFromDB);
-    console.log(turns);
   }, [turnsFromDB]);
+
+  const handleTurnCancel = (id_turn: string) => {
+    dispatch(cancelTurn(id_turn));
+  };
 
   const convertMinsToHrsMins = (mins: number): string => {
     const h = Math.floor(mins / 60);
@@ -38,10 +46,10 @@ function Turns() {
     return `${digitH}:${digitM}`;
   };
 
-  const renderTurns = (turnsFiltereds: ITurn[]) => {
+  const renderTurns = (turnsFiltereds: ITurn[], isPendig: boolean) => {
     if (turns.length > 0) {
       return turnsFiltereds.map((turn) => (
-        <Card className="max-w-60">
+        <Card className="max-w-60" key={turn.id_turn}>
           <CardHeader>
             <CardTitle className="flex flex-col items-center">
               <div className="flex justify-around gap-x-4">
@@ -60,9 +68,16 @@ function Turns() {
             />
           </CardContent>
           <CardFooter className="flex justify-center">
-            <Button className="bg-red-600 hover:bg-red-800 w-4/6">
-              cancel
-            </Button>
+            {isPendig && (
+              <Button
+                className="bg-red-600 hover:bg-red-800 w-4/6"
+                onClick={() => {
+                  handleTurnCancel(turn.id_turn as string);
+                }}
+              >
+                cancel
+              </Button>
+            )}
           </CardFooter>
         </Card>
       ));
@@ -81,7 +96,12 @@ function Turns() {
           </AccordionTrigger>
           <AccordionContent className="grid grid-cols-4 gap-4 px-4">
             {renderTurns(
-              turns.filter((turn) => new Date(turn.date) > new Date())
+              turns.filter(
+                (turn) =>
+                  moment(turn.date).isAfter(moment()) &&
+                  turn.state !== "Canceled"
+              ),
+              true
             )}
           </AccordionContent>
         </AccordionItem>
@@ -94,7 +114,8 @@ function Turns() {
           </AccordionTrigger>
           <AccordionContent className="grid grid-cols-4 gap-4">
             {renderTurns(
-              turns.filter((turn) => (turn.state as string) === "CANCELED")
+              turns.filter((turn) => (turn.state as string) === "Canceled"),
+              false
             )}
           </AccordionContent>
         </AccordionItem>
@@ -106,7 +127,7 @@ function Turns() {
             </div>
           </AccordionTrigger>
           <AccordionContent className="grid grid-cols-4 gap-4">
-            {renderTurns(turns)}
+            {renderTurns(turns, false)}
           </AccordionContent>
         </AccordionItem>
       </Accordion>

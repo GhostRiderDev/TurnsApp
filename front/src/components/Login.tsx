@@ -25,6 +25,8 @@ import { setLogedUser } from "@/reducer/userReducer";
 import ICredential from "@/interface/credential";
 import { AppDispatch } from "@/store/store";
 import { useDispatch } from "react-redux";
+import { ToastAction } from "@radix-ui/react-toast";
+import { useToast } from "./ui/use-toast";
 
 const loginSchema = z.object({
   username: z.string().email(),
@@ -34,6 +36,7 @@ const loginSchema = z.object({
 const Login = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -48,7 +51,16 @@ const Login = () => {
       ...values,
     };
     const response = await dispatch(setLogedUser(credentials));
-    console.log(response);
+    if (!response.payload) {
+      toast({
+        variant: "destructive",
+        title: "Invalid User",
+        description: "Invalid credentials",
+        duration: 3000,
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
+      return;
+    }
     navigate("/user");
   };
 

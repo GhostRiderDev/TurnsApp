@@ -13,5 +13,5 @@ export const login = async (credentials: {
 
 export const register = async (user: IuserToRegister) => {
   const result = await axios.post(`${BASE_URL}/register`, user);
-  return result.data;
+  return result;
 };

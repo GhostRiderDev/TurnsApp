@@ -1,6 +1,6 @@
 import { UUID } from "crypto";
 
-enum EState {
+export enum EState {
   ACTIVE = "Active",
   CANCELED = "Canceled",
 }

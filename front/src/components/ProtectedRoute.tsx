@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
@@ -10,7 +10,13 @@ function ProtectedRoute({
   const user = useSelector((state: { user: object }) => state.user);
   const navigate = useNavigate();
 
-  return user ? children : <>{navigate("/home")}</>;
+  useEffect(() => {
+    if (!user) {
+      navigate("/home");
+    }
+  }, [user, navigate]);
+
+  return user ? children : null;
 }
 
 export default ProtectedRoute;

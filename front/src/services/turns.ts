@@ -22,5 +22,14 @@ export const createTurnClient = async (turnToPost: ITurn, token: string) => {
       },
     }
   );
-  console.log(response);
+  return response.data;
+};
+
+export const cancelTurnClient = async (id_turn: string, token: string) => {
+  const response = await axios.delete(`${BASE_URL}/${id_turn}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response;
 };
