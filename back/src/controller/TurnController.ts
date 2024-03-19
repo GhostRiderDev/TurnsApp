@@ -16,6 +16,8 @@ import ResourceNotFoundError from "../Error/ResourceNotFoundError";
 import InvalidOperatioError from "../Error/InvalidOperationError";
 import { decodeToken, getTokenFrom } from "../middleware/token";
 import { JwtPayload } from "jsonwebtoken";
+import { getFieldById, saveField } from "../service/FieldService";
+import FieldEntity from "../entity/FieldEntity";
 
 export const getTurns = async (_: Request, res: Response): Promise<void> => {
   const turns = await findTurns();
@@ -77,6 +79,17 @@ export const createTurn = async (
     if (!turnToSave) {
       throw new ValidationErrror("Turn not can be empty");
     }
+
+    //! This must be solve is garbage
+    getFieldById(turnToSave.id_fields[0]).catch(() => {
+      const fieldToSave: FieldEntity = {
+        id_field: turnToSave.id_fields[0] as UUID,
+        dimentions: 20,
+        image_field: "https://w7.pngwin-transparent-luis-diaz.png",
+        description: "Cool field",
+      };
+      saveField(fieldToSave);
+    });
 
     validateTurn(turnToSave);
     const clienDB = findUser(turnToSave.id_client as UUID);

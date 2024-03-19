@@ -19,3 +19,8 @@ export const getFieldById = async (id: UUID): Promise<FieldEntity> => {
   }
   return field;
 };
+
+export const saveField = async (field: FieldEntity): Promise<FieldEntity> => {
+  const savedField = await FieldDAO.save(field);
+  return savedField;
+};
